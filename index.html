@@ -2,23 +2,16 @@
 <html lang="uk">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Дія</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="liquidGlass.js"></script>
-<script src="https://cloudflare.com"></script>
-<script src="liquidGL.js"></script>
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<link rel="apple-touch-icon" href="icon.png">
+<title>Дія</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Дія">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 
 
@@ -221,6 +214,31 @@ nav button img,.nav button img,.tabs button img,.tabbar button img{width:20px;he
 .toast{position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom));transform:translate(-50%,12px);z-index:20;background:#0C1310;color:#fff;font-size:12px;padding:9px 15px;border-radius:9px;opacity:0;pointer-events:none;transition:.22s;white-space:nowrap}
 @media(min-width:500px){.toast{position:absolute;bottom:92px}}
 .toast.on{opacity:1;transform:translate(-50%,0)}
+
+html {
+  height: -webkit-fill-available;
+}
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  overflow: hidden;
+  background: #080A09;
+}
+.app {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: -webkit-fill-available;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
 </style>
 
 </head>
