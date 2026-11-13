@@ -1,0 +1,60 @@
+name: Build Unsigned IPA
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Pods if needed
+        run: |
+          if [ -f "Podfile" ]; then
+            pod install
+          elif [ -d "src" ] && [ -f "src/Podfile" ]; then
+            cd src && pod install
+          fi
+
+      - name: Build Xcode Archive
+        run: |
+          WORKSPACE=$(find . -maxdepth 3 -name "*.xcworkspace" | grep -v "xcodeproj" | head -n 1)
+          if [ -n "$WORKSPACE" ]; then
+            SCHEME=$(xcodebuild -list -workspace "$WORKSPACE" | awk '/Schemes:/,0' | sed -n '2p' | xargs)
+            xcodebuild -workspace "$WORKSPACE" \
+              -scheme "$SCHEME" \
+              -configuration Release \
+              -sdk iphoneos \
+              -archivePath build/App.xcarchive \
+              CODE_SIGN_IDENTITY="" \
+              CODE_SIGNING_REQUIRED=NO \
+              CODE_SIGNING_ALLOWED=NO \
+              archive
+          else
+            PROJECT=$(find . -maxdepth 3 -name "*.xcodeproj" | head -n 1)
+            SCHEME=$(xcodebuild -list -project "$PROJECT" | awk '/Schemes:/,0' | sed -n '2p' | xargs)
+            xcodebuild -project "$PROJECT" \
+              -scheme "$SCHEME" \
+              -configuration Release \
+              -sdk iphoneos \
+              -archivePath build/App.xcarchive \
+              CODE_SIGN_IDENTITY="" \
+              CODE_SIGNING_REQUIRED=NO \
+              CODE_SIGNING_ALLOWED=NO \
+              archive
+          fi
+
+      - name: Package IPA
+        run: |
+          mkdir -p Payload
+          cp -r build/App.xcarchive/Products/Applications/*.app Payload/
+          zip -r App-unsigned.ipa Payload
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: App-unsigned-ipa
+          path: App-unsigned.ipa
