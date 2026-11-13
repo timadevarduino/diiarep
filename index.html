@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Дія">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <link rel="apple-touch-icon" href="icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -161,6 +161,30 @@ nav button img,.nav button img,.tabs button img,.tabbar button img{width:20px;he
 .tile .box{width:38px;height:38px;border-radius:10px;margin:0 auto 9px}
 .tile .box img{width:20px;height:20px;object-fit:contain;filter:brightness(0) invert(1)}
 
+/* 1. Прибираємо верхній padding з main, щоб скрол ішов до самого краю екрана */
+main {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  padding-top: 0 !important;
+  padding-bottom: 62px !important;
+}
+
+/* 2. Додаємо відступ зверху саме контенту, щоб початково він стояв нижче Dynamic Island */
+.feed {
+  padding: 64px 16px 0 !important;
+}
+.back {
+  margin-top: 64px !important;
+}
+.stage {
+  padding-top: 76px !important;
+}
+
+
 /* профиль */
 .back{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.5);border:0;display:grid;place-items:center;cursor:pointer;margin:14px 0 0 28px}
 .me{padding:8px 0 0;margin:0 28px;text-align:center}
@@ -182,18 +206,16 @@ nav button img,.nav button img,.tabs button img,.tabbar button img{width:20px;he
 @media(min-width:500px){.homebar{display:block;position:absolute;left:50%;bottom:5px;transform:translateX(-50%);width:128px;height:4px;border-radius:3px;background:rgba(255,255,255,.9);z-index:6}}
 
 .tabbar {
-  position: fixed;
+  position: fixed !important;
   left: 0;
   right: 0;
-
+  bottom: 0 !important;
   z-index: 5;
   display: flex;
   background: #080A09;
-    bottom: -24px !important;
-  padding: 10px 2px 34px !important;
-
-
+  padding: 6px 2px 8px !important;
 }
+
 
 
 [contenteditable]{outline:none;border-radius:5px;transition:background .15s}
