@@ -1,0 +1,17 @@
+{
+  "name": "Дія",
+  "short_name": "Дія",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#080A09",
+  "theme_color": "#6794C1",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
