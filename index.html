@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Дія</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="liquidGlass.js"></script>
+<script src="https://cloudflare.com"></script>
+<script src="liquidGL.js"></script>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+ы
+
+
+
+<style>
+@font-face{
+  font-family:'e-Ukraine';
+  src:local('e-Ukraine'),local('eUkraine'),url('e-Ukraine-Regular.woff2') format('woff2'),url('e-Ukraine-Regular.ttf') format('truetype');
+  font-weight:400;font-display:swap}
+@font-face{
+  font-family:'e-Ukraine';
+  src:local('e-Ukraine Medium'),url('e-Ukraine-Medium.woff2') format('woff2'),url('e-Ukraine-Medium.ttf') format('truetype');
+  font-weight:500 600;font-display:swap}
+@font-face{
+  font-family:'e-Ukraine';
+  src:local('e-Ukraine Bold'),url('e-Ukraine-Bold.woff2') format('woff2'),url('e-Ukraine-Bold.ttf') format('truetype');
+  font-weight:700 800;font-display:swap}
+@font-face{
+  font-family:'e-Ukraine Head';
+  src:local('e-Ukraine Head'),url('e-UkraineHead-Bold.woff2') format('woff2'),url('e-UkraineHead-Bold.ttf') format('truetype');
+  font-weight:700 800;font-display:swap}
+
+:root{
+  --tx:#14231A;
+  --font:'e-Ukraine',Manrope,-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,Arial,sans-serif;
+  --font-head:'e-Ukraine Head','e-Ukraine',Manrope,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+
+  /* ===== ПОДСТРОЙКА КАРТОЧКИ — крути эти строки ===== */
+  --card-scale:1.06;              /* масштаб: 1 = как есть, больше — растянуть, меньше — сжать */
+  --card-w:calc(98% - 12px);      /* ширина карточки: 100% = на всю ширину, можно 340px и т.д. */
+  --card-h:470px;                 /* высота: auto = по содержимому, можно 560px и т.д. */
+  --card-alpha:.6;                /* прозрачность карточки: 1 = плотная, .6 = просвечивает */
+  --card-grey:0;                  /* серость: 0 = чистая, .2-.5 = серая дымка */
+  --card-top:130px;               /* отступ сверху */
+  --card-mx:30px;                 /* отступы слева и справа */
+  --card-bottom:64px;             /* отступ снизу */
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overscroll-behavior:none}
+body{font-family:var(--font);background:#0A1016;display:flex;align-items:center;justify-content:center;min-height:100dvh}
+.app{position:relative;width:100%;max-width:390px;height:100dvh;max-height:844px;overflow:hidden;
+  display:flex;flex-direction:column;touch-action:manipulation;background:#6794C1}
+.bg{position:absolute;inset:0;overflow:hidden}
+.bg::before{content:"";position:absolute;inset:-10%;filter:blur(52px);transform:translateZ(0)}
+
+.g-doc{background:linear-gradient(180deg,#6794C1 0%,#8FA8CE 14%,#A2BED6 34%,#B7D2CE 56%,#CBE2B4 78%,hsl(74, 100%, 75%) 100%)}
+.g-doc::before{background:
+  radial-gradient(circle at 0% calc(50% + 30px),rgba(240,233,112,.78) 0 95px,transparent 96px),
+  radial-gradient(circle at 100% 100%,rgba(240,233,112,.72) 0 105px,transparent 106px)}
+
+.g-feed{background:linear-gradient(180deg,#A9C6E2 0%,#B7D1DA 22%,#C3DEC7 48%,#CAE5C1 74%,#CCE8BD 100%)}
+.g-feed::before{background:
+  radial-gradient(circle at 0% calc(50% + 30px),rgba(240,233,112,.6) 0 85px,transparent 86px),
+  radial-gradient(circle at 100% 100%,rgba(240,233,112,.55) 0 95px,transparent 96px)}
+
+.g-me{background:linear-gradient(180deg,#8BA6D6 0%,#A2BCE0 40%,#BFD6EC 100%)}
+.g-me::before{background:
+  radial-gradient(circle at 0% calc(50% + 30px),rgba(240,233,112,.55) 0 85px,transparent 86px),
+  radial-gradient(circle at 100% 100%,rgba(240,233,112,.5) 0 95px,transparent 96px)}
+
+main{position:relative;z-index:2;flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;padding-bottom:96px}
+main::-webkit-scrollbar{display:none}
+
+/* ===== СТРІЧКА ===== */
+.feed{padding:16px 16px 0}
+.fhead{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px}
+.fhead .hello{flex:1}
+.hello{font-family:var(--font-head);font-size:26px;font-weight:800;color:#0F1F17;letter-spacing:-.7px;margin:0;line-height:1.16}
+.fsub{font-size:12.5px;color:#33453B;margin:14px 0 10px;font-weight:600;letter-spacing:.1px}
+.meava{width:40px;height:40px;border-radius:50%;flex:none;border:0;padding:0;overflow:hidden;background:#fff;
+  display:grid;place-items:center;cursor:pointer;box-shadow:0 4px 14px -8px rgba(20,50,35,.7);
+  font-size:13px;font-weight:800;color:#3D5548}
+.meava img{width:100%;height:100%;object-fit:cover}
+
+.msg{position:relative;background:#fff;border-radius:16px;padding:14px 15px;margin-bottom:12px;
+  box-shadow:0 10px 26px -22px rgba(16,40,30,.7)}
+.msg h4{margin:0 0 8px;font-size:12.5px;font-weight:700;color:#0F1F17}
+.msg p{margin:0;font-size:15px;line-height:1.3;color:#0F1F17;font-weight:500}
+.msg .next{position:absolute;top:0;left:calc(100% + 8px);width:100%;height:100%;background:#fff;border-radius:16px;
+  box-shadow:0 10px 26px -22px rgba(16,40,30,.7)}
+.msgwrap{overflow:hidden;margin-right:-2px;padding-right:2px}
+.dots{display:flex;gap:6px;justify-content:center;padding:2px 0 20px;align-items:center}
+.dots i{width:5px;height:5px;border-radius:50%;background:rgba(20,40,30,.18)}
+.dots i.on{background:#3A4A40;width:7px;height:7px}
+
+.unbrk{background:rgba(255,255,255,.62);border-radius:18px;padding:16px 16px 15px;margin-bottom:22px;
+  box-shadow:0 10px 26px -24px rgba(16,40,30,.6)}
+.unbrk h3{margin:0 0 6px;font-family:var(--font-head);font-size:21px;font-weight:800;color:#0F1F17;letter-spacing:-.5px}
+.unbrk p{margin:0 0 14px;font-size:12.5px;color:#33453B;font-weight:600}
+.unbrk .row{display:flex;align-items:center;gap:7px}
+.chip{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#2E7DFF}
+.chip2{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#FFD500}
+.chip svg,.chip2 svg{width:15px;height:15px}
+.arrow{margin-left:auto;width:30px;height:30px;border-radius:50%;background:#0C0F0D;border:0;display:grid;place-items:center;cursor:pointer}
+
+.tiles{display:flex;gap:12px;margin-bottom:22px;padding:0 4px}
+.tile{flex:1;text-align:center;cursor:pointer;border:0;background:none;padding:0;font-family:inherit}
+.tile .box{aspect-ratio:1;border-radius:18px;background:#0B0F0D;display:grid;place-items:center;margin-bottom:9px;
+  box-shadow:0 12px 22px -18px rgba(6,14,10,.9)}
+.tile .box svg{width:26px;height:26px;stroke:#fff;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.tile span{font-size:11.5px;font-weight:600;color:#12211A;line-height:1.25;display:block;letter-spacing:-.1px}
+
+.banner{position:relative;height:134px;border-radius:16px;overflow:hidden;background:#07090C;margin-bottom:22px}
+.banner .streaks{position:absolute;inset:-10%;opacity:.9;filter:blur(.4px);
+  background:
+    repeating-linear-gradient(64deg,rgba(255,205,0,.85) 0 1.6px,transparent 1.6px 8px) left/34% 130% no-repeat,
+    repeating-linear-gradient(-64deg,rgba(46,125,255,.95) 0 1.6px,transparent 1.6px 8px) right/38% 130% no-repeat}
+.banner img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+
+.sec{display:flex;align-items:baseline;justify-content:space-between;margin:0 2px 10px}
+.sec h3{margin:0;font-family:var(--font-head);font-size:12px;font-weight:800;color:#0F1F17;letter-spacing:-.4px}
+.sec span{font-size:12px;font-weight:600;color:#33453B}
+.rows{background:#fff;border-radius:16px;overflow:hidden;margin-bottom:20px;box-shadow:0 10px 26px -24px rgba(16,40,30,.6)}
+.rows button{width:100%;border:0;background:none;display:flex;align-items:center;gap:12px;padding:13px 14px;
+  font-size:13.5px;font-weight:600;color:#12211A;font-family:inherit;border-bottom:1px solid #EFF3F1;cursor:pointer;text-align:left}
+.rows button:last-child{border-bottom:0}
+.rows .ic{width:34px;height:34px;border-radius:10px;background:#EAF3FF;display:grid;place-items:center;flex:none}
+.rows .ic svg{width:17px;height:17px;stroke:#0852BE;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.rows .go{margin-left:auto;width:24px;height:24px;border-radius:50%;background:#0C0F0D;display:grid;place-items:center;flex:none}
+.rows .go svg{width:11px;height:11px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round}
+
+/* паспорт */
+.stage{position:relative;display:flex;justify-content:center;
+  padding:var(--card-top) var(--card-mx) var(--card-bottom)}
+.card{position:relative;width:var(--card-w);max-width:none;min-height:var(--card-h);margin:0 auto;display:flex;flex-direction:column;
+  background:
+    linear-gradient(180deg,rgba(233,242,249,var(--card-alpha)) 0%,rgba(223,238,235,var(--card-alpha)) 42%,rgba(214,234,200,var(--card-alpha)) 100%),
+    linear-gradient(rgba(138,148,154,var(--card-grey)),rgba(138,148,154,var(--card-grey)));
+  border:1px solid rgba(255,255,255,.7);
+  border-radius:26px;backdrop-filter:blur(20px) saturate(1.1);-webkit-backdrop-filter:blur(20px) saturate(1.1);overflow:hidden;
+  transform:scale(var(--card-scale));transform-origin:top center;will-change:transform;
+  box-shadow:0 18px 40px -30px rgba(16,40,66,.45),inset 0 1px 0 rgba(255,255,255,.7)}
+.ctitle{margin:0;padding:18px 16px 0;font-family:var(--font-head);font-size:22px;line-height:1.2;font-weight:600;color:var(--tx);letter-spacing:-.5px}
+.ctitle .flag{display:inline-block;vertical-align:-3px;margin-left:3px}
+.grid{display:flex;gap:13px;padding:14px 16px 0}
+.photo{position:relative;width:118px;height:168px;border-radius:9px;flex:none;background:#fff;overflow:hidden;
+  cursor:pointer;display:grid;place-items:center;box-shadow:0 3px 10px -6px rgba(20,45,70,.35)}
+.photo img{width:100%;height:100%;object-fit:cover;display:block}
+.photo .empty{display:flex;flex-direction:column;align-items:center;gap:6px;color:#A6B8B0;font-size:10px;font-weight:600}
+.photo .empty svg{width:25px;height:25px;stroke:#A6B8B0;fill:none;stroke-width:1.5}
+.cam{position:absolute;right:4px;bottom:4px;width:23px;height:23px;border-radius:50%;background:#16281C;
+  display:grid;place-items:center;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.cam svg{width:12px;height:12px;stroke:#fff;fill:none;stroke-width:1.7}
+.photo.drag{outline:2px dashed #2E7DFF;outline-offset:-3px}
+.fields{display:flex;flex-direction:column;gap:10px;padding-top:2px;min-width:0;flex:1}
+.lbl{font-size:12.5px;line-height:1.22;color:#33453B;font-weight:500}
+.val{font-size:14px;font-weight:700;color:var(--tx);margin-top:3px;letter-spacing:.2px}
+.sig{height:44px;margin:2px 0 0;width:96px;cursor:pointer;display:grid;place-items:center;flex:none}
+.sig img,.sig svg{max-width:100%;max-height:100%;object-fit:contain}
+.gap{height:22px;flex:1;min-height:22px}
+
+.valid{background:#CFEA92;padding:6px 0;font-size:11.5px;font-weight:700;color:var(--tx);
+  overflow:hidden;position:relative;white-space:nowrap}
+.valid::before,.valid::after{content:"";position:absolute;top:0;bottom:0;width:14px;z-index:2}
+.valid::before{left:0;background:linear-gradient(90deg,#CFEA92,transparent)}
+.valid::after{right:0;background:linear-gradient(90deg,#CFEA92,transparent)}
+.track{display:flex;width:max-content;animation:run 14s linear infinite;padding-left:16px}
+.track.paused{animation-play-state:paused}
+.track span{padding-right:28px;display:inline-flex;align-items:center}
+@keyframes run{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+.nameblock{display:flex;align-items:flex-start;gap:10px;padding:15px 16px 20px}
+.name{font-family:var(--font-head);font-size:23px;line-height:1.3;font-weight:500;color:var(--tx);letter-spacing:-.3px}
+.more{width:31px;height:31px;border-radius:50%;background:#0C0F0D;border:0;flex:none;
+  margin:15px 0 0 auto;display:grid;place-items:center;cursor:pointer}
+.dots.doc{padding:14px 0 4px;gap:8px}
+.dots.doc i{width:6px;height:6px;background:rgba(255,255,255,.6)}
+.dots.doc i:first-child{width:7px;height:7px;background:#fff}
+.dots.doc i.sm{width:4px;height:4px}
+
+.tile .box img {
+  filter: invert(1);
+}
+
+.tile:first-child .box {
+  background: rgba(255, 255, 255, 0.22) !important;
+  backdrop-filter: url(#liquid-glass-filter) blur(2px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(180%) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.75) !important;
+  box-shadow:
+    inset 0 2px 3px rgba(255, 255, 255, 0.9),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.18),
+    0 10px 24px rgba(0, 0, 0, 0.14) !important;
+}
+
+.tile:first-child .box svg {
+  stroke: #12241A !important;
+}
+
+
+
+.tile .box {
+  width: 38px;          /* Нова ширина квадрата (підберіть під себе, наприклад, 64px–76px) */
+  height: 38px;         /* Нова висота квадрата (має дорівнювати ширині) */
+  border-radius: 10px;  /* Пропорційне заокруглення кутів під менший розмір */
+  margin: 0 auto;       /* Центрує квадрат над текстом, якщо кнопка ширша за нього */
+}
+
+.me,
+.rows {
+  margin-left: 28px;
+  margin-right: 28px;
+}
+
+
+
+/* профиль */
+.back{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.5);border:0;display:grid;place-items:center;cursor:pointer;margin:14px 0 0 16px}
+.me{padding:8px 16px 0;text-align:center}
+.me .ava{width:126px;height:126px;border-radius:50%;background:#fff;overflow:hidden;margin:0 auto 12px;display:grid;place-items:center;cursor:pointer;box-shadow:0 8px 24px -12px rgba(20,50,35,.6)}
+.me .ava img{width:100%;height:100%;object-fit:cover}
+.me h2{margin:0 0 4px;font-family:var(--font-head);font-size:25px;font-weight:800;color:var(--tx);letter-spacing:-.6px}
+.me p{margin:0 0 18px;font-size:12.5px;color:#3D5548;font-weight:600}
+
+/* таббар */
+.tabbar{position:absolute;left:0;right:0;bottom:0;z-index:5;display:flex;background:#080A09;padding:9px 2px 14px}
+.tabbar button{flex:1;border:0;background:none;color:#7E8580;font-size:10.5px;font-weight:600;
+  display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;font-family:inherit}
+.tabbar button.on{color:#fff;font-weight:800}
+.tabbar svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.tabbar .bolt{fill:currentColor;stroke:none}
+.homebar{position:absolute;left:50%;bottom:5px;transform:translateX(-50%);width:128px;height:4px;border-radius:3px;background:rgba(255,255,255,.9);z-index:6}
+
+[contenteditable]{outline:none;border-radius:5px;transition:background .15s}
+[contenteditable]:focus{background:rgba(255,255,255,.7);box-shadow:0 0 0 2px rgba(46,125,255,.45);padding:0 3px;margin:0 -3px}
+
+.draw{position:absolute;inset:0;z-index:12;background:rgba(8,16,12,.55);display:none;align-items:center;justify-content:center;padding:24px}
+.draw.on{display:flex}
+.drawbox{background:#fff;border-radius:20px;padding:14px;width:100%}
+.drawbox canvas{display:block;width:100%;aspect-ratio:120/46;background:#fff;border-radius:10px;touch-action:none}
+.drawbox p{margin:10px 2px 2px;font-size:12px;color:#6D8B79;text-align:center}
+.drawbox .row{display:flex;gap:8px;margin-top:10px}
+.drawbox button{flex:1;border:0;border-radius:11px;padding:11px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer}
+.drawbox .ok{background:#0B69E8;color:#fff}
+.drawbox .no{background:#EAF3FF;color:#0852BE}
+
+.scrim{position:absolute;inset:0;background:rgba(6,14,10,.55);opacity:0;pointer-events:none;transition:.2s;z-index:8}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:9;background:#fff;border-radius:22px 22px 0 0;transform:translateY(102%);max-height:86%;transition:transform .26s cubic-bezier(.3,.9,.3,1);display:flex;flex-direction:column}
+.sheet.on{transform:none}
+.sheet header{padding:16px 18px 12px;display:flex;align-items:center;border-bottom:1px solid #ECEFF3}
+.sheet header h3{margin:0;font-size:16px;color:#12211A}
+.sheet .body{padding:14px 18px;overflow-y:auto}
+.field{margin-bottom:11px}
+.field label{display:block;font-size:10.5px;font-weight:700;color:#7B8794;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
+.field input{width:100%;border:1px solid #E4E9F0;background:#F7F9FC;border-radius:11px;padding:12px;font-size:14px;font-family:inherit;color:#12211A}
+.uprow{display:flex;gap:10px;margin-bottom:14px}
+.uprow label,.uprow button{flex:1;text-align:center;background:#EAF3FF;color:#0852BE;border:0;border-radius:12px;padding:13px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+.uprow input{display:none}
+.sheet footer{padding:12px 18px 26px;display:flex;gap:10px;border-top:1px solid #ECEFF3}
+.btn{flex:1;border:0;border-radius:13px;padding:14px;font-size:14px;font-weight:600;font-family:inherit;background:#0B69E8;color:#fff;cursor:pointer}
+.btn.ghost{background:#EAF3FF;color:#0852BE}
+.toast{position:absolute;left:50%;bottom:92px;transform:translate(-50%,12px);z-index:20;background:#0C1310;color:#fff;font-size:12px;padding:9px 15px;border-radius:9px;opacity:0;pointer-events:none;transition:.22s;white-space:nowrap}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+
+
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="bg g-doc" id="bg"></div>
+  <main id="view"></main>
+  <nav class="tabbar" id="tabbar"></nav>
+  <div class="homebar"></div>
+
+  <div class="draw" id="draw"><div class="drawbox">
+    <canvas id="cv"></canvas>
+    <p>Намалюйте підпис — відпустіть палець, щоб зберегти</p>
+    <div class="row"><button class="no" id="drawCancel">Скасувати</button>
+      <button class="ok" id="drawClear">Очистити</button></div>
+  </div></div>
+
+  <div class="scrim" id="scrim"></div>
+  <div class="sheet" id="sheet">
+    <header><h3>Редагування</h3>
+      <button class="btn ghost" id="closeSheet" style="flex:none;margin-left:auto;padding:8px 14px">✕</button></header>
+    <div class="body" id="sheetBody"></div>
+    <footer><button class="btn ghost" id="resetBtn">Скинути</button>
+      <button class="btn" id="saveBtn">Зберегти</button></footer>
+  </div>
+  <div class="toast" id="toast"></div>
+</div>
+<input type="file" id="fileIn" accept="image/*" hidden>
+
+<script>
+const KEY='diia-passport-v15';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+const DEFAULTS={
+  title:'Паспорт громадянина<br>України', dob:'24.08.1991', number:'ХХ000000',
+  ticker:'Документ дійсний на 12:06 | 22.06.2026 • Документ сформовано в застосунку Дія •',
+  n1:'Дія', n2:'Надія', n3:'Володимирівна', photo:'', signature:''
+};
+const SIG_SVG=`<svg viewBox="0 0 120 46" fill="none" stroke="#16281C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+<path d="M8 36c6-4 8-2 11-9s6-16 9-15-1 12 2 15 6-6 9-10 5-6 6-3-2 9 1 12 7-1 10-4"/>
+<path d="M14 40c14-3 32-4 48-2"/></svg>`;
+const TRIDENT = `<img class="flag" src="gerb.png" alt="Trident" width="15" height="18" style="margin-left: 0px;">`;
+
+
+let state;
+try{ state={...DEFAULTS, ...(JSON.parse(localStorage.getItem(KEY))||{})}; }catch(e){ state={...DEFAULTS}; }
+const persist=()=>{try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}};
+let screen='doc';
+
+function toast(t){const el=$('toast');el.textContent=t;el.classList.add('on');
+  clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('on'),1600)}
+
+const initials=()=>(esc(state.n1[0]||'')+esc(state.n2[0]||'')).toUpperCase();
+
+const photoHTML=()=>state.photo?`<div class="photo" id="photo"><img src="${state.photo}" alt=""></div>`
+  :`<div class="photo" id="photo"><div class="empty"><svg viewBox="0 0 24 24"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.2"/></svg><span>Фото</span></div></div>`;
+
+function buildTicker(){
+  const t=$('track'); if(!t) return;
+  const block=`<span><em style="font-style:normal">${esc(state.ticker)}</em></span>`;
+  t.innerHTML=block+block;
+  t.style.animationDuration=Math.max(9,Math.round(state.ticker.length*0.4))+'s';
+}
+
+function viewDoc(){
+  return `<div class="stage">
+    <div class="card">
+      <h1 class="ctitle"><span contenteditable spellcheck="false" data-k="title">${state.title}</span>
+
+${TRIDENT}</h1>
+
+      <div class="grid">
+        ${photoHTML()}
+        <div class="fields">
+          <div><div class="lbl">Дата<br>народження:</div>
+            <div class="val" contenteditable spellcheck="false" data-k="dob">${esc(state.dob)}</div></div>
+          <div><div class="lbl">Номер:</div>
+            <div class="val" contenteditable spellcheck="false" data-k="number">${esc(state.number)}</div></div>
+          <div class="sig" id="sigBox">${state.signature?`<img src="${state.signature}">`:SIG_SVG}</div>
+        </div>
+      </div>
+      <div class="gap"></div>
+      <div class="valid" id="ticker"><div class="track" id="track"></div></div>
+      <div class="nameblock">
+        <div class="name">
+          <span contenteditable spellcheck="false" data-k="n1">${esc(state.n1)}</span><br>
+          <span contenteditable spellcheck="false" data-k="n2">${esc(state.n2)}</span><br>
+          <span contenteditable spellcheck="false" data-k="n3">${esc(state.n3)}</span>
+        </div>
+        <button class="more" data-action="edit" aria-label="Ще">
+          <svg width="14" height="4" viewBox="0 0 15 4" fill="#fff"><circle cx="2" cy="2" r="1.7"/><circle cx="7.5" cy="2" r="1.7"/><circle cx="13" cy="2" r="1.7"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="dots doc"><i></i><i></i><i></i><i></i><i class="sm"></i></div>`;
+}
+
+const SVC=[
+  ['Довідка про доходи','M4 18h16M6 18V9l6-4 6 4v9M9.5 13h5'],
+  ['Витяг з реєстру','M6 3.5h9l3.5 3.5v13.5h-12.5zM15 3.5V7h3.5M9 12h6M9 15.5h6'],
+  ['Заміна паспорта','M5 5.5h9.5a2 2 0 012 2v11h-11.5zM7.5 9.5h6M7.5 13h6'],
+  ['Довідка ВПО','M12 3.5l7 3v6c0 4-3 6.5-7 8-4-1.5-7-4-7-8v-6zM9.2 12l2 2 3.6-3.6']
+];
+
+function viewFeed(){
+  return `<div class="feed">
+    <div class="fhead">
+      <h1 class="hello">Привіт, ${esc(state.n2)} 👋</h1>
+      <button class="meava" data-action="tab" data-tab="me">${state.photo?`<img src="${state.photo}">`:initials()}</button>
+    </div>
+    <div class="msgwrap">
+      <div class="msg"><div class="next"></div>
+        <h4>Зверніть увагу</h4>
+        <p>Вам надійшов запит на додання картки платника податків (РНОКПП)</p>
+      </div>
+    </div>
+    <div class="dots"><i class="on"></i><i></i><i></i><i></i></div>
+
+    <div class="unbrk">
+      <h3>Незламність</h3>
+      <p>Мапа Пунктів Незламності</p>
+      <div class="row">
+        <span class="chip"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2.6l7.4 5.5-2.9 11.6H7.5L4.6 8.1z"/></svg></span>
+        <span class="chip2"><svg viewBox="0 0 24 24" fill="#16281C"><path d="M13.4 2L4.8 13.4h5.3l-1.1 8.6 8.6-11.4h-5.3z"/></svg></span>
+        <button class="arrow" data-action="toast" data-msg="Мапа Пунктів Незламності">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>
+        </button>
+      </div>
+    </div>
+
+   <div class="tiles">
+  <button class="tile" data-action="toast" data-msg="Сканувати QR-код">
+    <div class="box"><svg viewBox="0 0 24 24"><path d="M4 9V5.8A1.8 1.8 0 015.8 4H9M15 4h3.2A1.8 1.8 0 0120 5.8V9M20 15v3.2a1.8 1.8 0 01-1.8 1.8H15M9 20H5.8A1.8 1.8 0 014 18.2V15"/><path d="M9 9h2.4v2.4H9zM12.6 12.6H15V15h-2.4z"/></svg></div>
+    <span>Сканувати<br>QR-код</span>
+  </button>
+  <button class="tile" data-action="toast" data-msg="Військові облігації">
+    <div class="box">${TRIDENT}</div>
+    <span>Військові<br>облігації</span>
+  </button>
+  <button class="tile" data-action="toast" data-msg="Чатбот єВорог">
+    <div class="box"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.4"/><circle cx="12" cy="12" r="2.2"/><path d="M12 4.6v2.4M12 17v2.4M4.6 12H7M17 12h2.4"/></svg></div>
+    <span>Чатбот<br>єВорог</span>
+  </button>
+</div>
+
+    <div class="banner">
+      <div class="streaks"></div>
+      <img src="Army_Of_drones.png" alt="" onerror="this.style.display='none'">
+    </div>
+
+    <div class="sec"><h3>Популярні послуги</h3><span>Усі</span></div>
+    <div class="rows">
+      ${SVC.map(([t,d])=>`<button data-action="toast" data-msg="${esc(t)}">
+        <span class="ic"><svg viewBox="0 0 24 24"><path d="${d}"/></svg></span>${esc(t)}
+        <span class="go"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span></button>`).join('')}
+    </div>
+  </div>`;
+}
+
+function viewMe(){
+  const rows=['Свідоцтво про народження','Шлюб','Сімейний лікар','Пільги','Бізнес','Нерухомість','Земля','Сплачені податки'];
+  return `<button class="back" data-action="feed">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16281C" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <div class="me">
+      <div class="ava" id="avaBox">${state.photo?`<img src="${state.photo}">`:`<span style="color:#8AA396;font-size:11px">Фото</span>`}</div>
+      <h2>${esc(state.n1)} ${esc(state.n2)}</h2><p>Відомості про мене</p>
+    </div>
+    <div class="rows">${rows.map(r=>`<button data-action="toast" data-msg="${esc(r)}">${esc(r)}
+        <span class="go"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span></button>`).join('')}</div>`;
+}
+
+function viewServices(){
+  const items=['Довідка про доходи','Витяг з реєстру','Заміна паспорта','Реєстрація місця проживання','Довідка ВПО','Шлюб онлайн'];
+  return `<div class="feed"><h1 class="hello" style="margin:6px 0 16px">Сервіси</h1>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    ${items.map(i=>`<button class="tile" data-action="toast" data-msg="${esc(i)}" style="background:#fff;border-radius:16px;padding:14px;font-size:12.5px;font-weight:700;color:#0F1F17;text-align:left;box-shadow:0 10px 24px -22px rgba(16,40,30,.6)">${esc(i)}</button>`).join('')}
+    </div></div>`;
+}
+
+const TABS = [
+  {
+    k: 'feed',
+    l: 'Стрічка',
+    svg: `<img src="Strichka_icon.png" width="15" height="18" style="margin-left: 0px;" alt="Стрічка">`
+  },
+  {
+    k: 'doc',
+    l: 'Документи',
+    svg: `<img src="Document_icon.png" width="15" height="18" style="margin-left: 0px;" alt="Документи">`
+  },
+  {
+    k: 'services',
+    l: 'Сервіси',
+    svg: `<img src="Services_icon.png" width="15" height="18" style="margin-left: 0px;" alt="Сервіси">`
+  },
+  {
+    k: 'me',
+    l: 'Меню',
+    svg: `<img src="Menu_icon.png" width="15" height="18" style="margin-left: 0px;" alt="Меню">`
+  }
+];
+
+
+function render(){
+  $('bg').className='bg '+(screen==='doc'?'g-doc':screen==='me'?'g-me':'g-feed');
+  $('view').innerHTML = screen==='doc'?viewDoc():screen==='feed'?viewFeed():screen==='me'?viewMe():viewServices();
+  $('view').scrollTop=0;
+  $('tabbar').innerHTML=TABS.map(t=>`<button data-action="tab" data-tab="${t.k}" class="${screen===t.k?'on':''}">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">${t.svg}</svg>${t.l}</button>`).join('');
+  if(screen==='doc'){
+    buildTicker();
+    const tk=$('ticker');
+    tk.addEventListener('mouseenter',()=>$('track').classList.add('paused'));
+    tk.addEventListener('mouseleave',()=>$('track').classList.remove('paused'));
+    $('sigBox').onclick=openDraw;
+    $('photo').onclick=()=>{ $('fileIn').value=''; $('fileIn').click(); };
+    bindDrop();
+  }
+  if(screen==='me'){ $('avaBox').onclick=()=>{ $('fileIn').value=''; $('fileIn').click(); }; }
+}
+
+document.addEventListener('blur',e=>{
+  const el=e.target.closest?.('[data-k]'); if(!el) return;
+  const k=el.dataset.k;
+  state[k]= k==='title'?el.innerHTML:el.textContent.trim();
+  persist(); if(k==='ticker') buildTicker();
+},true);
+
+function readImage(file){
+  const r=new FileReader();
+  r.onload=()=>{ const img=new Image();
+    img.onload=()=>{ const max=1100, s=Math.min(1,max/Math.max(img.width,img.height));
+      const c=document.createElement('canvas');
+      c.width=Math.round(img.width*s); c.height=Math.round(img.height*s);
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+      state.photo=c.toDataURL('image/jpeg',.92); persist(); render(); toast('Фото оновлено'); };
+    img.src=r.result; };
+  r.readAsDataURL(file);
+}
+$('fileIn').onchange=e=>{ const f=e.target.files[0]; if(f) readImage(f); };
+function bindDrop(){
+  const pb=document.getElementById('photo'); if(!pb) return;
+  ['dragenter','dragover'].forEach(t=>pb.addEventListener(t,e=>{e.preventDefault();pb.classList.add('drag')}));
+  ['dragleave','drop'].forEach(t=>pb.addEventListener(t,e=>{e.preventDefault();pb.classList.remove('drag')}));
+  pb.addEventListener('drop',e=>{ const f=e.dataTransfer.files[0]; if(f) readImage(f); });
+}
+
+const cv=$('cv'), ctx=cv.getContext('2d'); let drawing=false, dirty=false;
+function initCanvas(){
+  const r=cv.getBoundingClientRect(), dpr=Math.min(window.devicePixelRatio||1,3);
+  cv.width=Math.round(r.width*dpr); cv.height=Math.round(r.height*dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,r.width,r.height);
+  ctx.lineWidth=2.1; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.strokeStyle='#16281C'; dirty=false;
+}
+const pos=e=>{ const r=cv.getBoundingClientRect(); return [e.clientX-r.left,e.clientY-r.top]; };
+cv.addEventListener('pointerdown',e=>{ cv.setPointerCapture(e.pointerId); drawing=true;
+  const [x,y]=pos(e); ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+.1,y+.1); ctx.stroke(); dirty=true; });
+cv.addEventListener('pointermove',e=>{ if(!drawing)return; const [x,y]=pos(e); ctx.lineTo(x,y); ctx.stroke(); });
+function finishDraw(){ if(!drawing)return; drawing=false; if(!dirty)return;
+  state.signature=cv.toDataURL('image/png'); persist(); $('draw').classList.remove('on');
+  render(); toast('Підпис додано'); }
+cv.addEventListener('pointerup',finishDraw);
+cv.addEventListener('pointercancel',finishDraw);
+function openDraw(){ $('draw').classList.add('on'); requestAnimationFrame(initCanvas); }
+$('drawCancel').onclick=()=>$('draw').classList.remove('on');
+$('drawClear').onclick=()=>{ ctx.clearRect(0,0,cv.width,cv.height); dirty=false; };
+
+function openSheet(){
+  const rows=[['n1','Ім’я'],['n2','Друге ім’я'],['n3','Прізвище'],['dob','Дата народження'],
+    ['number','Номер документа'],['ticker','Текст бегущей строки']];
+  $('sheetBody').innerHTML=`<div class="uprow">
+      <label>Фото<input type="file" id="sf" accept="image/*"></label>
+      <button id="drawBtn">Намалювати підпис</button></div>` +
+    rows.map(([k,l])=>`<div class="field"><label>${esc(l)}</label><input data-f="${k}" value="${esc(state[k])}"></div>`).join('') +
+    `<div class="field"><label>Заголовок (перший рядок)</label><input data-f="title" value="${esc(state.title.split('<br>')[0])}"></div>`;
+  $('scrim').classList.add('on'); $('sheet').classList.add('on');
+  $('sf').onchange=e=>{const f=e.target.files[0];if(f)readImage(f)};
+  $('drawBtn').onclick=()=>{ closeSheet(); openDraw(); };
+}
+function closeSheet(){$('scrim').classList.remove('on');$('sheet').classList.remove('on')}
+$('closeSheet').onclick=closeSheet;
+$('scrim').onclick=closeSheet;
+$('saveBtn').onclick=()=>{
+  document.querySelectorAll('[data-f]').forEach(i=>{
+    const k=i.dataset.f; state[k]= k==='title'?esc(i.value)+'<br>України':i.value; });
+  persist(); render(); closeSheet(); toast('Збережено');
+};
+$('resetBtn').onclick=()=>{ state={...DEFAULTS}; persist(); render(); closeSheet(); toast('Скинуто'); };
+
+// Викликаємо після того, як вкладка зі стрічкою/сервісами відмалювалась
+function enableSafariLiquidGlass() {
+  const box = document.querySelector('.tile:first-child .box');
+  if (!box || box.dataset.glReady) return;
+  box.dataset.glReady = '1';
+
+  liquidGL({
+    target: '.tile:first-child .box',
+    resolution: 2.0,       // чіткість для Retina-екранів iPhone
+    refraction: 0.03,      // сила заломлення лінзи по краях
+    bevelDepth: 0.08,      // глибина скосу країв
+    bevelWidth: 0.15,      // ширина скляної фаски
+    frost: 2.5,            // легке матування всередині
+    shadow: true,          // об'ємна тінь
+    specular: true         // білі відблиски по периметру
+  });
+}
+
+
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-action]'); if(!b) return;
+  const a=b.dataset.action;
+  if(a==='tab'){ screen=b.dataset.tab; render(); }
+  else if(a==='edit'){ openSheet(); }
+  else if(a==='toast'){ toast(b.dataset.msg||''); }
+});
+
+render();
+</script>
+</body>
+</html>
