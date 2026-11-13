@@ -181,6 +181,18 @@ nav button img,.nav button img,.tabs button img,.tabbar button img{width:20px;he
 .homebar{display:none}
 @media(min-width:500px){.homebar{display:block;position:absolute;left:50%;bottom:5px;transform:translateX(-50%);width:128px;height:4px;border-radius:3px;background:rgba(255,255,255,.9);z-index:6}}
 
+.tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  background: #080A09;
+  padding: 10px 2px calc(18px + env(safe-area-inset-bottom)) !important;
+}
+
+
 [contenteditable]{outline:none;border-radius:5px;transition:background .15s}
 [contenteditable]:focus{background:rgba(255,255,255,.7);box-shadow:0 0 0 2px rgba(46,125,255,.45);padding:0 3px;margin:0 -3px}
 
