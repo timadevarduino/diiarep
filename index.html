@@ -811,7 +811,7 @@ function openSheet(){
   $('sf').onchange=e=>{const f=e.target.files[0];if(f)readImage(f)};
   $('drawBtn').onclick=()=>{ closeSheet(); openDraw(); };
 }
-function closeSheet(){$('scrim').classList.remove('on');$('sheet').classList.remove('on')}
+function closeSheet(){$('scrim').classList.remove('on');$('sheet').classList.remove('on');$('sheet').querySelector('footer').style.display='flex';$('sheet').querySelector('h3').textContent='Редагування';}
 $('closeSheet').onclick=closeSheet;
 $('scrim').onclick=closeSheet;
 $('saveBtn').onclick=()=>{
@@ -910,6 +910,53 @@ function enableSafariLiquidGlass() {
       if (timerSpan) timerSpan.textContent = `${m}:${s}`;
     }, 1000);
   }
+    const DOC_KEY = 'diia-extra-docs-v1';
+    let extraDocs = [];
+    try { extraDocs = JSON.parse(localStorage.getItem(DOC_KEY)) || []; } catch (e) {}
+    const saveExtra = () => { try { localStorage.setItem(DOC_KEY, JSON.stringify(extraDocs)); } catch (e) {} };
+
+    const CATALOG = [
+      { id: 'rnokpp', urgent: true, name: 'Картка платника податків', sub: 'РНОКПП • Запит знятий', num: '3348901254' },
+      { id: 'zakordon', name: 'Закордонний паспорт', sub: 'Біометричний документ', num: 'FG004812' },
+      { id: 'edoc', name: 'єДокумент', sub: 'Тимчасове посвідчення', num: 'ЄД001924' },
+      { id: 'tech', name: 'Свідоцтво про реєстрацію ТЗ', sub: 'Техпаспорт на авто * Mersedes gl 3500 2002', num: 'СХТ481920' },
+      { id: 'stud', name: 'Студентський квиток', sub: 'Денна форма навчання', num: 'КВ12849012' },
+      { id: 'birth', name: 'Свідоцтво про народження', sub: 'Актовий запис №412', num: 'І-БК 492810' },
+      { id: 'pens', name: 'Пенсійне посвідчення', sub: 'За віком', num: 'ПН849201' }
+    ];
+
+    function openAddDocSheet() {
+      const urg = CATALOG.filter(d => d.urgent);
+      const rest = CATALOG.filter(d => !d.urgent);
+      const rowBtn = (d) => `<button type="button" data-action="pick-doc" data-id="${d.id}" style="width:100%;border:0;background:${d.urgent?'#FFFBEB':'#F7F9FC'};border-radius:14px;padding:13px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;text-align:left;font-family:inherit;cursor:pointer">
+        <div><div style="font-size:14px;font-weight:700;color:#0F1F17">${d.name}</div><div style="font-size:11.5px;color:#5A6E63;margin-top:2px">${d.sub}</div></div>
+        <span style="background:#0C0F0D;color:#fff;border-radius:99px;padding:5px 11px;font-size:11.5px;font-weight:700">${extraDocs.includes(d.id)?'✓':'+'}</span>
+      </button>`;
+
+      $('sheet').querySelector('h3').textContent = 'Додати документ';
+      $('sheetBody').innerHTML = `<div style="font-size:11px;font-weight:800;color:#B45309;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">⚡ Терміново</div>` +
+        urg.map(rowBtn).join('') +
+        `<div style="font-size:11px;font-weight:800;color:#5A6E63;text-transform:uppercase;letter-spacing:.5px;margin:14px 0 6px">Усі документи</div>` +
+        rest.map(rowBtn).join('');
+      $('sheet').querySelector('footer').style.display = 'none';
+      $('scrim').classList.add('on'); $('sheet').classList.add('on');
+    }
+
+    function renderExtraCard(id, nameText, photoSrc) {
+      const d = CATALOG.find(x => x.id === id) || CATALOG[0];
+      const hasPhoto = ['zakordon', 'edoc', 'stud', 'pens'].includes(id);
+      return `<div class="card">
+        <h2 class="ctitle">${d.name}</h2>
+        ${hasPhoto ? `<div class="grid">${photoSrc?`<div class="photo"><img src="${photoSrc}"></div>`:`<div class="photo"><span style="color:#A6B8B0;font-size:11px;font-weight:600">Фото</span></div>`}
+          <div class="fields"><div><div class="lbl">Дата народження:</div><div class="val" contenteditable="true">${esc(state.dob)}</div></div><div><div class="lbl">Статус:</div><div class="val">Дійсний</div></div></div></div>`
+        : `<div style="padding:18px 16px 0"><div class="lbl">${d.sub}</div><div style="font-family:var(--font-head);font-size:26px;font-weight:800;letter-spacing:1px;margin-top:8px" contenteditable="true">${d.num}</div></div>`}
+        <div class="gap"></div>
+        <div class="valid"><div class="track" style="animation:none"><span>Документ дійсний • Дія •</span></div></div>
+        <div class="nameblock"><div class="name" contenteditable="true">${nameText.replace(/\n/g,'<br>')}</div>
+        <button class="more" type="button" data-action="toast" data-msg="${d.name}"><svg width="14" height="4" viewBox="0 0 15 4" fill="#fff"><circle cx="2" cy="2" r="1.7"/><circle cx="7.5" cy="2" r="1.7"/><circle cx="13" cy="2" r="1.7"/></svg></button></div>
+      </div>`;
+    }
+
 
   function buildCarousel() {
     const passportCard = document.querySelector('.card:not(.dl-card)');
@@ -975,9 +1022,36 @@ function enableSafariLiquidGlass() {
     `;
     carousel.appendChild(slide2);
     attachBack(slide2.querySelector('.dl-card'));
+          const allSlides = [slide1, slide2];
+      extraDocs.forEach((doc) => {
+        const s = document.createElement('div');
+        s.className = 'doc-slide far';
+        s.innerHTML = renderExtraCard(doc, nameText, photoSrc);
+        carousel.appendChild(s);
+        attachBack(s.querySelector('.card'));
+        allSlides.push(s);
+      });
+
+      const actSlide = document.createElement('div');
+      actSlide.className = 'doc-slide far';
+      actSlide.innerHTML = `
+        <div style="width:100%;display:flex;flex-direction:column;justify-content:center;gap:12px;padding:0 8px">
+          <button type="button" data-action="add-doc" style="border:0;background:rgba(255,255,255,.88);border-radius:20px;padding:18px;display:flex;align-items:center;gap:14px;font-family:inherit;font-size:15px;font-weight:700;color:#0F1F17;cursor:pointer;box-shadow:0 12px 26px -18px rgba(16,40,30,.5)">
+            <span style="width:36px;height:36px;border-radius:50%;background:#0C0F0D;color:#fff;display:grid;place-items:center;font-size:20px;flex:none">+</span>Додати документ
+          </button>
+          <button type="button" data-action="order-doc" style="border:0;background:rgba(255,255,255,.72);border-radius:20px;padding:18px;display:flex;align-items:center;gap:14px;font-family:inherit;font-size:15px;font-weight:700;color:#0F1F17;cursor:pointer">
+            <span style="width:36px;height:36px;border-radius:50%;background:rgba(12,15,13,.1);color:#0F1F17;display:grid;place-items:center;font-size:16px;flex:none">⇅</span>Порядок документів
+          </button>
+        </div>`;
+      carousel.appendChild(actSlide);
+      allSlides.push(actSlide);
+
+   
+
 
     // Плавне масштабування карток і перемикання крапок при свайпі
-    const slides = [slide1, slide2];
+        const slides = allSlides;
+
     const dots = document.querySelectorAll('.dots.doc i');
 
     carousel.addEventListener('scroll', () => {
@@ -1007,7 +1081,15 @@ function enableSafariLiquidGlass() {
       if (act === 'tab') { screen = btn.dataset.tab; render(); }
       else if (act === 'feed') { screen = 'feed'; render(); }
       else if (act === 'edit') { openSheet(); }
+      else if (act === 'add-doc') { openAddDocSheet(); }
+      else if (act === 'pick-doc') {
+        const id = btn.dataset.id;
+        if (!extraDocs.includes(id)) { extraDocs.push(id); saveExtra(); render(); }
+        closeSheet(); toast('Документ додано');
+      }
+      else if (act === 'order-doc') { extraDocs = []; saveExtra(); render(); toast('Список скинуто'); }
       else if (act === 'toast') { toast(btn.dataset.msg || ''); }
+
       return;
     }
 
