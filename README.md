@@ -1,5 +1,5 @@
 # diiarep
 Diia goverment app replica
- Fake dia! HTML Build changable photos etc
- NOT FOR PUBLIC USE, PRIVATE ROOM ONLY
+ dia with changable names, etc ! HTML Build changable photos etc
+ DO NOT USE IN SHOPS AND ETC, ONLY FOR PERSONAL USE
  
