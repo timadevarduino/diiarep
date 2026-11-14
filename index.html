@@ -515,6 +515,8 @@ html, body {
 .dl-bottom {display:flex;align-items:center;justify-content:space-between;padding:16px 16px 20px;margin-top:auto}
 .dl-num {font-family:var(--font-head);font-size:22px;font-weight:700;letter-spacing:0.5px;color:var(--tx)}
 
+
+
 .tabbar {
   z-index: 999 !important;
   pointer-events: auto !important;
@@ -523,7 +525,8 @@ html, body {
 .tabbar button {
   pointer-events: auto !important;
   cursor: pointer !important;
-}
+}.doc-carousel { touch-action: pan-x !important; }
+
 
 </style>
 
@@ -734,8 +737,9 @@ function render(){
   $('bg').className='bg '+(screen==='doc'?'g-doc':screen==='me'?'g-me':'g-feed');
   $('view').innerHTML = screen==='doc'?viewDoc():screen==='feed'?viewFeed():screen==='me'?viewMe():viewServices();
   $('view').scrollTop=0;
-  $('tabbar').innerHTML=TABS.map(t=>`<button data-action="tab" data-tab="${t.k}" class="${screen===t.k?'on':''}">
-      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">${t.svg}</svg>${t.l}</button>`).join('');
+  $('tabbar').innerHTML= TABS.map(t=>`<button data-action="tab" data-tab="${t.k}" class="${screen===t.k?'on':''}">
+  ${t.svg}${t.l}</button>`).join('');
+
   if(screen==='doc'){
     buildTicker();
     const tk=$('ticker');
@@ -795,7 +799,8 @@ $('drawCancel').onclick=()=>$('draw').classList.remove('on');
 $('drawClear').onclick=()=>{ ctx.clearRect(0,0,cv.width,cv.height); dirty=false; };
 
 function openSheet(){
-  const rows=[['n1','Ім’я'],['n2','Друге ім’я'],['n3','Прізвище'],['dob','Дата народження'],
+  const rows=[['n1',"Ім'я"],['n2',"Друге ім'я"],['n3','Прізвище'],['dob','Дата народження'],
+
     ['number','Номер документа'],['ticker','Текст бегущей строки']];
   $('sheetBody').innerHTML=`<div class="uprow">
       <label>Фото<input type="file" id="sf" accept="image/*"></label>
@@ -993,21 +998,23 @@ function enableSafariLiquidGlass() {
     });
   }
 
-  const obs = new MutationObserver(buildCarousel);
-  obs.observe(document.body, { childList: true, subtree: true });
-  setTimeout(buildCarousel, 100);
-
+    let isDown = false, startX = 0, scrollLeft = 0, moved = false;
   document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action]');
+    if (btn) {
+      const act = btn.dataset.action;
+      if (act === 'tab') { screen = btn.dataset.tab; render(); }
+      else if (act === 'feed') { screen = 'feed'; render(); }
+      else if (act === 'edit') { openSheet(); }
+      else if (act === 'toast') { toast(btn.dataset.msg || ''); }
+      return;
+    }
+
+    if (e.target.closest('[contenteditable], button, .photo, .sig')) return;
     const card = e.target.closest('.card');
-    if (!card) return;
-    if (e.target.closest('.photo, .sig, .more, [contenteditable="true"]')) return;
-    card.classList.toggle('flipped');
+    if (card) card.classList.toggle('flipped');
   });
-})();
-
-
-
-render();
+})();render();
 </script>
 </body>
 </html>
