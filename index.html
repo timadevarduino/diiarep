@@ -13,6 +13,30 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="manifest" href="manifest.json">
+<script src="liquidglass.js"></script>
+<script>liquidGL({ radius: 26, bevel: 24, ior: 1.48 });</script>
+<script src="https://cloudflare.com"></script>
+<script src="liquidGL.js"></script>
+<script src="liquidGL-helper.js"></script>
+<script>
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      if (typeof liquidGL === 'function') {
+        liquidGL({
+          target: '.card',
+          resolution: 2.0,
+          refraction: 0.035,
+          bevelDepth: 0.09,
+          bevelWidth: 0.16,
+          frost: 2.5,
+          shadow: true,
+          specular: true
+        });
+      }
+    }, 350); // задержка, чтобы карусель и права успели отрисоваться
+  });
+</script>
+
 
 
 
@@ -28,8 +52,15 @@
 :root{
   --tx:#14231A;
   --font:'e-Ukraine',Manrope,-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,Arial,sans-serif;
-  --font-head:'e-Ukraine Head','e-Ukraine',Manrope,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
-  --card-scale:1;--card-w:100%;--card-h:clamp(450px,64dvh,570px);--card-alpha:.6;--card-grey:0;
+ .g-doc, .g-feed, .g-me { background: linear-gradient(180deg, #6794C1 0%, #8FA8CE 28%, #A2BED6 64%, #ACC6DC 100%); }
+.bg::before {
+  background: radial-gradient(circle at 0% calc(50% + 45px), rgba(240, 233, 112, .82) 0 155px, transparent 156px),
+              radial-gradient(circle at 100% 100%, rgba(240, 233, 112, .85) 0 205px, transparent 206px);
+  transform: translate3d(var(--bx, 0px), var(--by, 0px), 0) scale(var(--bs, 1));
+  transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
   --card-top:calc(28px + env(safe-area-inset-top));--card-mx:clamp(20px,6.5vw,32px);--card-bottom:calc(88px + env(safe-area-inset-bottom));
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -526,6 +557,16 @@ html, body {
   pointer-events: auto !important;
   cursor: pointer !important;
 }.doc-carousel { touch-action: pan-x !important; }
+
+.bg { z-index: 0 !important; }
+#lg-canvas { position: fixed !important; inset: 0 !important; z-index: 1 !important; pointer-events: none !important; }
+main { z-index: 2 !important; background: transparent !important; }
+.card {
+  background: rgba(255, 255, 255, 0.18) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
 
 
 </style>
@@ -1055,6 +1096,12 @@ function enableSafariLiquidGlass() {
     const dots = document.querySelectorAll('.dots.doc i');
 
     carousel.addEventListener('scroll', () => {
+              const bg = document.getElementById('bg');
+        if (bg) {
+          bg.style.setProperty('--bx', `${-carousel.scrollLeft * 0.14}px`);
+          bg.style.setProperty('--by', `${Math.sin(carousel.scrollLeft / 180) * 28}px`);
+        }
+
       const slideW = slide1.offsetWidth + 12;
       if (!slideW) return;
       const idx = Math.round(carousel.scrollLeft / slideW);
@@ -1078,7 +1125,14 @@ function enableSafariLiquidGlass() {
     const btn = e.target.closest('[data-action]');
     if (btn) {
       const act = btn.dataset.action;
-      if (act === 'tab') { screen = btn.dataset.tab; render(); }
+            if (act === 'tab' || act === 'feed') {
+        screen = act === 'feed' ? 'feed' : btn.dataset.tab;
+        render();
+        const pos = { feed: ['35px', '-45px', '1.08'], doc: ['0px', '0px', '1'], services: ['-40px', '30px', '1.05'], me: ['25px', '55px', '0.95'] }[screen] || ['0px', '0px', '1'];
+        const bg = document.getElementById('bg');
+        if (bg) { bg.style.setProperty('--bx', pos); bg.style.setProperty('--by', pos); bg.style.setProperty('--bs', pos); }
+      }
+
       else if (act === 'feed') { screen = 'feed'; render(); }
       else if (act === 'edit') { openSheet(); }
       else if (act === 'add-doc') { openAddDocSheet(); }
